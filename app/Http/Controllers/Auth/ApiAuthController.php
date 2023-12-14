@@ -33,7 +33,7 @@ class ApiAuthController extends Controller
         $request['password'] = Hash::make($request['password']);
         $request ['remember_token'] = Str::random(10);
         User::create($request->toArray());
-        $response=('You is registrate succesfuly');
+        $response = ('You is registrate succesfuly');
         return response($response, 200);
     }
 
@@ -48,39 +48,61 @@ class ApiAuthController extends Controller
         }
         $user = User::query()->where('email', $request['email'])->first();
 
-if ($user) {
-           if (Hash::check($request->password, $user->password)) {
-
-           /* $response = Http::asForm()->post('http://127.0.0.1:8001/oauth/token', [
-                    'grant_type' => 'password',
-                    'client_id' => '2',
-                    'client_secret' => 'VkHjfC8nmbfx8mFOzMusAo7UoEszzFxhR2dzzizw',
-                    'username' => 'name',
-                    'password' => request('password'),
-                    'scope' => '*',]) ;*/
-
+        if ($user) {
+            if (Hash::check($request->password, $user->password)) {
+                /* $response = Http::asForm()->post('http://127.0.0.1:8001/oauth/token', [
+                         'grant_type' => 'password',
+                         'client_id' => '2',
+                         'client_secret' => 'VkHjfC8nmbfx8mFOzMusAo7UoEszzFxhR2dzzizw',
+                         'username' => 'name',
+                         'password' => request('password'),
+                         'scope' => '*',]) ;*/
 
 
-        $token=$user->createToken('Laravel Password Grant Client')->accessToken;
-              $response = ['token' => $token];
+                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+                $response = ['token' => $token];
                 return response($response, 422);
             } else {
                 $response = ["message" => "Password is wrong"];
                 return response($response, 422);
             }
-        }
-else {
-    $answer=('
+        } else {
+            $answer = ('
 You are not registered');
-    return $answer;
-}
+            return $answer;
+        }
     }
 
     public function logout(Request $request)
     {
-    $request->bearerToken();
+        $request->bearerToken();
         $request->user()->token()->delete();;
-        $response=["message"=>'You have been successfully logged out'];
-        return response($response,200);
+        $response = ["message" => 'You have been successfully logged out'];
+        return response($response, 200);
     }
+
+
+    public function enable(Request $request)
+    {
+        $user = Auth::user();
+        $enable = $user['enable'];
+
+
+        $enable = ($enable === 0) ? 1 : 0;
+
+        $check = User::query()->where('id', $user['id'])->update(['enable' => $enable]);
+
+        if ($check) {
+            return response()->json([
+                'success' => true,
+                'new_status' => $enable,
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'new_status' => $enable,
+        ]);
+    }
+
 }

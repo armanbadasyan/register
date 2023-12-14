@@ -20,17 +20,18 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/login',[ApiAuthController::class, 'login']);
-Route::post('/register',[ApiAuthController::class, 'register']);
+Route::post('/login', [ApiAuthController::class, 'login']);
+Route::post('/register', [ApiAuthController::class, 'register']);
 
-Route::group(['middleware'=>['auth:api']],function(){
-    Route::post('/logout', [ApiAuthController::class,'logout']);
+Route::group(['middleware' => ['auth:api']], function () {
+    Route::post('/logout', [ApiAuthController::class, 'logout']);
+
+    Route::post('/create', [CreateProductController::class, 'create']);
+    Route::get('/index', [CreateProductController::class, 'index']);
+    Route::get('/products/{user_id}', [CreateProductController::class, 'show']);
+
+    Route::put('enable', [ApiAuthController::class, 'enable']);
 });
-
-Route::post('/create',[CreateProductController::class,'create']);
-Route::middleware('auth:api')->get('/index',[CreateProductController::class,'index']);
-Route::get('/products/{user_id}',[CreateProductController::class,'show']);
-
 
 
 
