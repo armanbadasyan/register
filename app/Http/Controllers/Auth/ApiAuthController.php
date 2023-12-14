@@ -78,8 +78,8 @@ You are not registered');
 
     public function logout(Request $request)
     {
-
-        $request->user()->delete();
+    $request->bearerToken();
+        $request->user()->token()->delete();;
         $response=["message"=>'You have been successfully logged out'];
         return response($response,200);
     }
