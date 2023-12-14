@@ -33,7 +33,7 @@ class ApiAuthController extends Controller
         $request['password'] = Hash::make($request['password']);
         $request ['remember_token'] = Str::random(10);
         User::create($request->toArray());
-        $response=('You is registrated succesfuly');
+        $response=('You is registrate succesfuly');
         return response($response, 200);
     }
 
