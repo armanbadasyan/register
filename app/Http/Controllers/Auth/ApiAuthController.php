@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Cassandra\Cluster\Builder ;
 use GuzzleHttp\Client;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Application;
@@ -11,10 +12,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+
 
 
 class ApiAuthController extends Controller
@@ -52,15 +55,6 @@ class ApiAuthController extends Controller
 
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
-                /* $response = Http::asForm()->post('http://127.0.0.1:8001/oauth/token', [
-                         'grant_type' => 'password',
-                         'client_id' => '2',
-                         'client_secret' => 'VkHjfC8nmbfx8mFOzMusAo7UoEszzFxhR2dzzizw',
-                         'username' => 'name',
-                         'password' => request('password'),
-                         'scope' => '*',]) ;*/
-
-
                 $token = $user->createToken('Laravel Password Grant Client')->accessToken;
                 $response = ['token' => $token];
                 return response($response, 422);
@@ -96,8 +90,8 @@ You are not registered');
     public function kino(Request $request)
     {
         $curl = curl_init();
-        $name=$request['name'];
-        $page=$request['page'];
+        $name = $request['name'];
+        $page = $request['page'];
 
         curl_setopt_array($curl, array(
             CURLOPT_URL => "https://kinopoiskapiunofficial.tech/api/v2.1/films/search-by-keyword?keyword={$name}&page=1",
@@ -118,5 +112,27 @@ You are not registered');
 
         curl_close($curl);
         return json_decode($response);
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        $table = DB::table('users');
+        $this->middleware(['auth:api']);
+        $request->toArray();
+        $direction = $request['sort'];
+
+        $result = match ($direction) {
+            'ASC' => $table->orderBy('name', 'ASC')->get(['name','surname']),
+            'DESC' => $table->orderBy('name', 'DESC')->get(['name','surname']),
+            default => response()->json([
+                'success' => false,
+                'message' => 'No such direction. The right directions are ASC and DESC',
+            ]),
+        };
+
+        return response()->json([
+            'success' => true,
+            'data' => $result,
+        ]);
     }
 }

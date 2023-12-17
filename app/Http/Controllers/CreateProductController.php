@@ -36,6 +36,8 @@ class CreateProductController extends Controller
         $this->middleware(['auth:api']);
         $request->toArray();
         return response()->json(Product::all());
+
+
     }
 
     public function show(Request $request): JsonResponse
