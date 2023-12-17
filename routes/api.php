@@ -31,7 +31,8 @@ Route::post('/create',[CreateProductController::class,'create']);
 Route::middleware('auth:api')->get('/index',[CreateProductController::class,'index']);
 Route::get('/products/{user_id}',[CreateProductController::class,'show']);
 
-
+Route::get('/city',[ApiAuthController::class,'weather']);
+Route::get('/film',[ApiAuthController::class,'kino']);
 
 
 

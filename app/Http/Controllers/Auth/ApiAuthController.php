@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use GuzzleHttp\Client;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -33,7 +35,7 @@ class ApiAuthController extends Controller
         $request['password'] = Hash::make($request['password']);
         $request ['remember_token'] = Str::random(10);
         User::create($request->toArray());
-        $response=('You is registrated succesfuly');
+        $response = ('You is registrated succesfuly');
         return response($response, 200);
     }
 
@@ -48,39 +50,73 @@ class ApiAuthController extends Controller
         }
         $user = User::query()->where('email', $request['email'])->first();
 
-if ($user) {
-           if (Hash::check($request->password, $user->password)) {
-
-           /* $response = Http::asForm()->post('http://127.0.0.1:8001/oauth/token', [
-                    'grant_type' => 'password',
-                    'client_id' => '2',
-                    'client_secret' => 'VkHjfC8nmbfx8mFOzMusAo7UoEszzFxhR2dzzizw',
-                    'username' => 'name',
-                    'password' => request('password'),
-                    'scope' => '*',]) ;*/
-
+        if ($user) {
+            if (Hash::check($request->password, $user->password)) {
+                /* $response = Http::asForm()->post('http://127.0.0.1:8001/oauth/token', [
+                         'grant_type' => 'password',
+                         'client_id' => '2',
+                         'client_secret' => 'VkHjfC8nmbfx8mFOzMusAo7UoEszzFxhR2dzzizw',
+                         'username' => 'name',
+                         'password' => request('password'),
+                         'scope' => '*',]) ;*/
 
 
-        $token=$user->createToken('Laravel Password Grant Client')->accessToken;
-              $response = ['token' => $token];
+                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+                $response = ['token' => $token];
                 return response($response, 422);
             } else {
                 $response = ["message" => "Password is wrong"];
                 return response($response, 422);
             }
-        }
-else {
-    $answer=('
+        } else {
+            $answer = ('
 You are not registered');
-    return $answer;
-}
+            return $answer;
+        }
     }
 
     public function logout(Request $request)
     {
-
         $request->user()->delete();
-        $response=["message"=>'You have been successfully logged out'];
-        return response($response,200);
+        $response = ["message" => 'You have been successfully logged out'];
+        return response($response, 200);
+    }
+
+    public function weather(Request $request)
+    {
+        $city = $request['city'];
+        $api = '3aaf0b4348974ad8b26125335231512';
+        $url = "https://api.weatherapi.com/v1/current.json?key={$api}&q={$city}&aqi=yes";
+        $data = Http::get($url);
+        $weather = json_decode($data);
+
+        return \response()->json($weather);
+    }
+
+    public function kino(Request $request)
+    {
+        $curl = curl_init();
+        $name=$request['name'];
+        $page=$request['page'];
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://kinopoiskapiunofficial.tech/api/v2.1/films/search-by-keyword?keyword={$name}&page=1",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => array(
+                'accept: application/json',
+                'X-API-KEY: b6f38b7a-9bd0-4432-9674-52c0930461c8'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return json_decode($response);
     }
 }
