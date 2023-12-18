@@ -39,9 +39,7 @@ class ApiAuthController extends Controller
         $request ['remember_token'] = Str::random(10);
         User::create($request->toArray());
 
-        $response=('You is registrate succesfuly');
-
-        $response = ('You is registrated succesfuly');
+        $response = ('You is registrate succesfuly');
 
         return response($response, 200);
     }
@@ -59,30 +57,51 @@ class ApiAuthController extends Controller
 
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
-                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
-                $response = ['token' => $token];
-                return response($response, 422);
+                $response = Http::asForm()->post('http://127.0.0.1:8001/oauth/token', [
+                    'grant_type' => 'password',
+                    'client_id' => config('passport.personal_grant_passport_client.id'),
+                    'client_secret' => config('passport.personal_grant_passport_client.secret'),
+                    'username' => $request['email'],
+                    'password' => $request['password'],
+                    'scope' => '*',
+                ]);
+
+                $data = json_decode($response->getBody()->getContents(), true);
+
+                return response()->json($data);
             } else {
                 $response = ["message" => "Password is wrong"];
                 return response($response, 422);
             }
         } else {
-            $answer = ('You are not registered');
-            return $answer;
+            return 'You are not registered';
         }
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
+        $request->bearerToken();
+        $request->user()->token()->delete();
 
-    $request->bearerToken();
-        $request->user()->token()->delete();;
-        $response=["message"=>'You have been successfully logged out'];
-        return response($response,200);
+        $response = ['message' => 'You have been successfully logged out'];
 
-        $request->user()->delete();
-        $response = ["message" => 'You have been successfully logged out'];
-        return response($response, 200);
+        return response()->json($response);
+    }
+
+
+    public function enable(Request $request)
+    {
+        $user = Auth::user();
+        $enable = $user['enable'];
+
+        $enable = ($enable === 0) ? 1 : 0;
+
+        User::query()->where('id', $user['id'])->update(['enable' => $enable]);
+
+        return response()->json([
+            'success' => true,
+            'new_status' => $enable,
+        ]);
     }
 
     public function weather(Request $request)
@@ -100,7 +119,6 @@ class ApiAuthController extends Controller
     {
         $curl = curl_init();
         $name = $request['name'];
-        $page = $request['page'];
 
         curl_setopt_array($curl, array(
             CURLOPT_URL => "https://kinopoiskapiunofficial.tech/api/v2.1/films/search-by-keyword?keyword={$name}&page=1",
@@ -142,6 +160,7 @@ class ApiAuthController extends Controller
         return response()->json([
             'success' => true,
             'data' => $result,
+
         ]);
     }
 }
