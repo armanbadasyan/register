@@ -27,9 +27,12 @@ class Handler extends ExceptionHandler
             //
         });
     }
-
     public function render($request, Throwable $e)
     {
-        dd($e);
+        return response()->json([
+            'success' => false,
+            'data' => null,
+            'message' => $e->getMessage(),
+        ]);
     }
 }

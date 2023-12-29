@@ -11,6 +11,7 @@ class RegisterDto extends Data
     public string $name;
     public string $email;
     public string $password;
+    public string $surname;
 
     public static function fromRequest(RegisterRequest $request): RegisterDto
     {
@@ -18,6 +19,7 @@ class RegisterDto extends Data
             'name' => $request->getName(),
             'email' => $request->getEmail(),
             'password' => $request->getPassword(),
+            'surname' => $request->getSurname(),
 
         ]);
     }

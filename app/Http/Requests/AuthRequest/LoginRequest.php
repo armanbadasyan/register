@@ -29,4 +29,13 @@ class LoginRequest extends FormRequest
 
         ];
     }
+    public function getPassword(): string
+    {
+        return $this->get(self::PASSWORD);
+    }
+
+    public function getEmail(): string
+    {
+        return $this->get(self::EMAIL);
+    }
 }

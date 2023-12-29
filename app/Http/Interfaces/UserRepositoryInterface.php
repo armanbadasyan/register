@@ -7,5 +7,4 @@ interface UserRepositoryInterface
 
     public function registerUser($userInfo);
 
-    public function index($indexId);
 }
