@@ -1,8 +1,16 @@
 <?php
 
 use App\Http\Controllers\Auth\ApiAuthController;
+use App\Http\Controllers\Auth\EnableController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\CreateProductController;
+use App\Http\Controllers\KinoController;
+use App\Http\Controllers\ProductController\AllProductController;
+use App\Http\Controllers\ProductController\ProductByUser_idController;
+use App\Http\Controllers\ProductController\ProductCreateController;
+use App\Http\Controllers\SortController;
+use App\Http\Controllers\WeatherController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,27 +29,27 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/login',[ApiAuthController::class, 'login']);
+Route::post('/login',LoginController::class);
 Route::post('/register',[RegisterController::class,'register']);
-Route::get('/users',[ApiAuthController::class, 'index']);
-
-Route::post('/login', [ApiAuthController::class, 'login']);
-Route::post('/register', [ApiAuthController::class, 'register']);
-
-
 Route::group(['middleware' => ['auth:api']], function () {
-    Route::post('/logout', [ApiAuthController::class, 'logout']);
-
-    Route::post('/create', [CreateProductController::class, 'create']);
-    Route::get('/index', [CreateProductController::class, 'index']);
-    Route::get('/products/{user_id}', [CreateProductController::class, 'show']);
-
-
-Route::get('/city',[ApiAuthController::class,'weather']);
-Route::get('/film',[ApiAuthController::class,'kino']);
-
-    Route::put('enable', [ApiAuthController::class, 'enable']);
+    Route::post('/logout', LogoutController::class);
 });
+
+Route::put('enable', [EnableController::class,'enable']);
+Route::get('/city', [WeatherController::class, 'weather']);
+Route::get('/film', [KinoController::class, 'kino']);
+Route::get('/sort', [SortController::class, 'index'])->middleware(['auth:api']);;
+
+
+
+
+    Route::post('/create', [ProductCreateController::class, 'create']);
+    Route::get('/index', [AllProductController::class, 'index'])->middleware(['auth:api']);
+    Route::get('/products/{user_id}', [ProductByUser_idController::class, 'show']);
+
+
+
+
 
 
 

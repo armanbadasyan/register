@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRequest\LoginRequest;
 use App\Http\Resources\AuthResource\LoginResource;
 use App\Services\Actions\Auth\LoginAction;
-use App\Services\Auth\Dto\LoginDto;
+use App\Services\Dto\LoginDto;
 
-class LoginController
+
+class LoginController extends Controller
 {
 
     public function __invoke(

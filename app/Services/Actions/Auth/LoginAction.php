@@ -4,7 +4,8 @@ namespace App\Services\Actions\Auth;
 
 
 use App\Models\User;
-use App\Services\Auth\Dto\LoginDto;
+
+use App\Services\Dto\LoginDto;
 use Illuminate\Support\Facades\Hash;
 
 class LoginAction
@@ -31,5 +32,7 @@ class LoginAction
             return $response;
         }
 
-    }
+        }
+
+
 }
