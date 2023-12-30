@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\ApiAuthController;
+use App\Http\Controllers\Auth\CountUserController;
 use App\Http\Controllers\Auth\EnableController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
@@ -34,6 +35,7 @@ Route::post('/register',[RegisterController::class,'register']);
 Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/logout', LogoutController::class);
 });
+Route::get('/all users count', [CountUserController::class, 'count']);
 
 Route::put('enable', [EnableController::class,'enable']);
 Route::get('/city', [WeatherController::class, 'weather']);
